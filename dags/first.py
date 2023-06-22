@@ -14,9 +14,9 @@ default_args = {
 }
 
 for i in range(1, 4):
-
+    dag_id = f"docker_image_build-{str(i)}"
     # Instantiate the DAG
-    dag = DAG(f"docker_image_build-{str(i)}", default_args=default_args, schedule_interval=None)
+    dag = DAG(dag_id, default_args=default_args, schedule_interval=None)
 
     # Define the Git repository URL and the Docker image name
     GIT_REPO_URL = "https://github.com/your-username/your-repo.git"
@@ -43,3 +43,4 @@ for i in range(1, 4):
 
     # Define the task dependencies
     clone_repo >> build_docker_image >> upload_docker_image
+    globals()[dag_id] = dag
