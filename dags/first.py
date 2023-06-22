@@ -21,11 +21,12 @@ for i in range(1, 4):
     # Define the Git repository URL and the Docker image name
     GIT_REPO_URL = "https://github.com/your-username/your-repo.git"
     DOCKER_IMAGE_NAME = "your-docker-hub-username/your-image-name:your-tag"
+    bash_script_path = "../scripts/run-automation.sh"
 
     # Define the tasks
     clone_repo = BashOperator(
         task_id="clone_repo",
-        bash_command=f"echo 'git clone {GIT_REPO_URL} /tmp/repo' && sleep 10",
+        bash_command=f"bash {bash_script_path}",
         dag=dag,
     )
 
