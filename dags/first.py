@@ -13,31 +13,33 @@ default_args = {
     "retry_delay": timedelta(minutes=5),
 }
 
-# Instantiate the DAG
-dag = DAG("docker_image_build", default_args=default_args, schedule_interval=None)
+for i in range(1, 4):
 
-# Define the Git repository URL and the Docker image name
-GIT_REPO_URL = "https://github.com/your-username/your-repo.git"
-DOCKER_IMAGE_NAME = "your-docker-hub-username/your-image-name:your-tag"
+    # Instantiate the DAG
+    dag = DAG(f"docker_image_build-{str(i)}", default_args=default_args, schedule_interval=None)
 
-# Define the tasks
-clone_repo = BashOperator(
-    task_id="clone_repo",
-    bash_command=f"echo 'git clone {GIT_REPO_URL} /tmp/repo' && sleep 10",
-    dag=dag,
-)
+    # Define the Git repository URL and the Docker image name
+    GIT_REPO_URL = "https://github.com/your-username/your-repo.git"
+    DOCKER_IMAGE_NAME = "your-docker-hub-username/your-image-name:your-tag"
 
-build_docker_image = BashOperator(
-    task_id="build_docker_image",
-    bash_command="echo 'cd /tmp/repo/centos7 && docker build -t {} .'".format(DOCKER_IMAGE_NAME),
-    dag=dag,
-)
+    # Define the tasks
+    clone_repo = BashOperator(
+        task_id="clone_repo",
+        bash_command=f"echo 'git clone {GIT_REPO_URL} /tmp/repo' && sleep 10",
+        dag=dag,
+    )
 
-upload_docker_image = BashOperator(
-    task_id="upload_docker_image",
-    bash_command="echo 'docker push {}'".format(DOCKER_IMAGE_NAME),
-    dag=dag,
-)
+    build_docker_image = BashOperator(
+        task_id="build_docker_image",
+        bash_command="echo 'cd /tmp/repo/centos7 && docker build -t {} .'".format(DOCKER_IMAGE_NAME),
+        dag=dag,
+    )
 
-# Define the task dependencies
-clone_repo >> build_docker_image >> upload_docker_image
+    upload_docker_image = BashOperator(
+        task_id="upload_docker_image",
+        bash_command="echo 'docker push {}'".format(DOCKER_IMAGE_NAME),
+        dag=dag,
+    )
+
+    # Define the task dependencies
+    clone_repo >> build_docker_image >> upload_docker_image
